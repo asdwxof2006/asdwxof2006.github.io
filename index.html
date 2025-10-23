@@ -3,7 +3,7 @@
 
 <head>
 <meta charset="UTF-8">
-<title>asdwxof2006</title>
+<title>HOWELL 的網站</title>
 	<style>
 	ul {
 		list-style-type: none;
@@ -33,6 +33,20 @@
 	</style>
 </head>
 <body>
-<p>Hello</p>
+	<p>現在時間</p>
 </body>
+<script>
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const timeString = `${hours}:${minutes}:${seconds}`;
+      document.getElementById('clock').textContent = timeString;
+    }
+    // 初始載入一次
+    updateClock();
+    // 每秒更新一次
+    setInterval(updateClock, 1000);
+  </script>
 </html\>
