@@ -1,41 +1,41 @@
-<!doctype.htm>
-<html><!--這是宣告這是一個HTML5的程式碼-->
-
+<!DOCTYPE html>
+<html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<title>HOWELL 的網站</title>
-	<style>
-	ul {
-		list-style-type: none;
-		margin: 0;
-		padding: 0;
-		width: 150px;
-		background-color: #f1f1f1;
-	}
-			li a {
-				display: block;
-				color: #000;
-				padding: 8px 16px;
-				text-decoration: none;
-			}
-			li a:hover {
-				background-color: #555;
-				color: white;
-			}
-			li a:hover:not(.active) {
-				background-color: #555;
-				color: white;
-			}
-			.active {
-				background-color: #4CAF50;
-				color: white;
-			}
-	</style>
+  <meta charset="UTF-8">
+  <title>HOWELL 的網站</title>
+  <style>
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      width: 150px;
+      background-color: #f1f1f1;
+    }
+    li a {
+      display: block;
+      color: #000;
+      padding: 8px 16px;
+      text-decoration: none;
+    }
+    li a:hover {
+      background-color: #555;
+      color: white;
+    }
+    li a:hover:not(.active) {
+      background-color: #555;
+      color: white;
+    }
+    .active {
+      background-color: #4CAF50;
+      color: white;
+    }
+  </style>
 </head>
 <body>
-	<p>現在時間</p>
-</body>
-<script>
+  <p>現在時間：</p>
+  <div id="clock">載入中...</div>
+
+  <script>
     function updateClock() {
       const now = new Date();
       const hours = String(now.getHours()).padStart(2, '0');
@@ -44,9 +44,9 @@
       const timeString = `${hours}:${minutes}:${seconds}`;
       document.getElementById('clock').textContent = timeString;
     }
-    // 初始載入一次
-    updateClock();
-    // 每秒更新一次
-    setInterval(updateClock, 1000);
+
+    updateClock(); // 初始載入
+    setInterval(updateClock, 1000); // 每秒更新
   </script>
-</html\>
+</body>
+</html>
