@@ -11,13 +11,13 @@
     const files = await response.json();
 
     const list = document.getElementById("file-list");
-    list.innerHTML = ""; // 清空載入中
+    list.innerHTML = "";
 
     files.forEach(file => {
-      if (file.type === "file" && file.name !== "index.html") { // 排除 index.html
+      if (file.type === "file" && file.name.toLowerCase() !== "index.html") {
         const li = document.createElement("li");
         const a = document.createElement("a");
-        a.href = file.download_url; // GitHub 提供的下載連結
+        a.href = file.download_url;
         a.textContent = `下載 ${file.name}`;
         a.download = file.name;
         li.appendChild(a);
