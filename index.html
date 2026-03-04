@@ -5,26 +5,91 @@
   const repoOwner = "asdwxof2006";
   const repoName = "asdwxof2006.github.io";
 
-  async function fetchFiles() {
-    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/`;
-    const response = await fetch(url);
-    const files = await response.json();
-
-    const list = document.getElementById("file-list");
-    list.innerHTML = "";
-
-    files.forEach(file => {
-      if (file.type === "file" && file.name.toLowerCase() !== "index.html") {
-        const li = document.createElement("li");
-        const a = document.createElement("a");
-        a.href = file.download_url;
-        a.textContent = `下載 ${file.name}`;
-        a.download = file.name;
-        li.appendChild(a);
-        list.appendChild(li);
-      }
-    });
+  // 取得某個路徑(path)下的清單
+  async function fetchContents(path = "") {
+    const base = `https://api.github.com/repos/${repoOwner}/${repoName}/contents`;
+    const url = path ? `${base}/${encodeURIComponent(path)}` : `${base}/`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`GitHub API error ${res.status}`);
+    }
+    return res.json(); // array
   }
 
-  fetchFiles();
+  // 建立一個 <ul>，把該路徑底下的內容 render 進去
+  async function renderPath(containerUl, path = "") {
+    containerUl.innerHTML = "";
+
+    let items;
+    try {
+      items = await fetchContents(path);
+    } catch (e) {
+      containerUl.innerHTML = `<li>載入失敗：${e.message}</li>`;
+      return;
+    }
+
+    // 先把 index.html 濾掉（如果你不想顯示）
+    items = items.filter(x => x.name.toLowerCase() !== "index.html");
+
+    // 資料夾（dir）排前面，檔案（file）排後面
+    items.sort((a, b) => {
+      if (a.type !== b.type) return a.type === "dir" ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    for (const item of items) {
+      const li = document.createElement("li");
+
+      if (item.type === "dir") {
+        // 資料夾：顯示可展開的節點
+        const toggle = document.createElement("button");
+        toggle.textContent = `📁 ${item.name}`;
+        toggle.style.all = "unset";
+        toggle.style.cursor = "pointer";
+        toggle.style.color = "#58a6ff"; // GitHub 深色主題的藍色系
+        toggle.title = "點我展開/收合";
+
+        const childUl = document.createElement("ul");
+        childUl.style.marginLeft = "1.25rem";
+        childUl.hidden = true;
+
+        let loaded = false;
+        toggle.addEventListener("click", async () => {
+          // 第一次點擊才去載入子內容
+          if (!loaded) {
+            childUl.innerHTML = "<li>載入中...</li>";
+            await renderPath(childUl, path ? `${path}/${item.name}` : item.name);
+            loaded = true;
+          }
+          childUl.hidden = !childUl.hidden;
+        });
+
+        li.appendChild(toggle);
+        li.appendChild(childUl);
+      } else if (item.type === "file") {
+        // 檔案：直接顯示下載連結
+        const a = document.createElement("a");
+        a.href = item.download_url; // 直接下載原始檔
+        a.textContent = `⬇ 下載 ${item.name}`;
+        a.download = item.name;
+        li.appendChild(a);
+      } else {
+        // 其他類型（例如 submodule、symlink），可視需要處理
+        li.textContent = `（不支援的型別）${item.type} - ${item.name}`;
+      }
+
+      containerUl.appendChild(li);
+    }
+
+    if (!items.length) {
+      containerUl.innerHTML = "<li>（此資料夾為空）</li>";
+    }
+  }
+
+  // 啟動：渲染根目錄
+  (async () => {
+    const list = document.getElementById("file-list");
+    list.innerHTML = "載入中...";
+    await renderPath(list, "");
+  })();
 </script>
